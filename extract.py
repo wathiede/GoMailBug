@@ -44,7 +44,8 @@ def main(argv):
                         except LookupError:
                             print 'Unknown encoding %s for %r' % (charset, name)
                             output.write('%s|%s|%s\n' % (name.decode('latin-1'), rcpt[1], fn))
-            except:
+            except Exception, e:
+                print 'Failed to parse %s: %s' % (fn, e)
                 continue
 
 
