@@ -16,4 +16,4 @@ go run extract.go -email_pat=$1 -output=${GOFN}
 
 echo "Comparing"
 diff -u ${GOFN} ${PYFN} | less
-#rm -f ${PYFN} ${GOFN}
+rm -f ${PYFN} ${GOFN}
