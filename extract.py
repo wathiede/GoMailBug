@@ -32,17 +32,20 @@ def main(argv):
 
     with codecs.open(FLAGS.output, 'w', 'utf-8') as output:
         for fn in sorted(glob.glob(FLAGS.email_pat)):
-            with open(fn, 'rb') as fp:
-                msg = email.message_from_file(fp)
-                rcpts = email.utils.getaddresses(msg.get_all('to', []) +
-                                                 msg.get_all('cc', []))
-                for rcpt in rcpts:
-                    name, charset = email.header.decode_header(rcpt[0])[0]
-                    try:
-                        output.write('%s|%s|%s\n' % (name.decode(charset or 'latin-1'), rcpt[1], fn))
-                    except LookupError:
-                        print 'Unknown encoding %s for %r' % (charset, name)
-                        output.write('%s|%s|%s\n' % (name.decode('latin-1'), rcpt[1], fn))
+            try:
+                with open(fn, 'rb') as fp:
+                    msg = email.message_from_file(fp)
+                    rcpts = email.utils.getaddresses(msg.get_all('to', []) +
+                                                     msg.get_all('cc', []))
+                    for rcpt in rcpts:
+                        name, charset = email.header.decode_header(rcpt[0])[0]
+                        try:
+                            output.write('%s|%s|%s\n' % (name.decode(charset or 'latin-1'), rcpt[1], fn))
+                        except LookupError:
+                            print 'Unknown encoding %s for %r' % (charset, name)
+                            output.write('%s|%s|%s\n' % (name.decode('latin-1'), rcpt[1], fn))
+            except:
+                continue
 
 
 if __name__ == '__main__':
