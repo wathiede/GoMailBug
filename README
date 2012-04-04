@@ -1,0 +1,14 @@
+This project contains similar implementations in python and go.  You pass in a
+glob pattern and and output file and it will extract all To: and CC: fields
+and write the following to the output file specified:
+
+<name>|<email address>|<filename>
+
+This makes it easy to diff the outputs of the two implementations and gives
+you the file if you need to investigate further.
+
+compare.sh takes a single arg, a file glob pattern, runs each implementation,
+and diffs the output.
+
+The python implementation requires Google's python-gflags library from:
+http://code.google.com/p/python-gflags/
