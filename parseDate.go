@@ -8,6 +8,7 @@ import (
 	"net/mail"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 type BadDate struct {
@@ -32,9 +33,14 @@ func main() {
 		log.Fatalf("Failed to glob %q: %s", *maildirGlob, err)
 	}
 
+	start := time.Now()
+	reportChunk := 1000
 	for idx, fn := range files {
-		if idx != 0 && idx % 1000 == 0 {
-			log.Printf("Processing %d/%d", idx, len(files))
+		if idx != 0 && idx % reportChunk == 0 {
+			delta := time.Since(start)
+			log.Printf("Processing %d/%d %.2f msg/s", idx, len(files),
+				float64(reportChunk) / delta.Seconds())
+			start = time.Now()
 		}
 		r, err := os.Open(fn)
 		if err != nil {
@@ -59,6 +65,7 @@ func main() {
 			mailer := msg.Header.Get("X-Mailer")
 			if mailer == "" {
 				mailer = fn
+				//mailer = msg.Header.Get("From")
 			}
 			badDates = append(badDates, BadDate{
 				Date: msg.Header.Get("Date"),
@@ -71,7 +78,7 @@ func main() {
 
 	if count, ok := stats["failed-date-parse"]; ok || count != 0 {
 		log.Println("Saving bad dates to ", *csvFn)
-		f, err := os.OpenFile(*csvFn, os.O_CREATE | os.O_WRONLY, 0644)
+		f, err := os.OpenFile(*csvFn, os.O_CREATE | os.O_WRONLY | os.O_TRUNC, 0644)
 		if err != nil {
 			log.Fatal("Failed to create csv file %q: %s", *csvFn, err)
 		}
