@@ -45,15 +45,16 @@ func main() {
 		r, err := os.Open(fn)
 		if err != nil {
 			stats["failed-open"]++
+			log.Print(err)
 			continue
 		} else {
 			stats["success-open"]++
 		}
 
 		msg, err := mail.ReadMessage(r)
+		r.Close()
 		if err != nil {
 			stats["failed-mail-parse"]++
-			r.Close()
 			continue
 		} else {
 			stats["success-mail-parse"]++
